@@ -1,4 +1,4 @@
-name: ESP-IDF 4.4 Build
+name: ESP-IDF Build
 
 on:
   push:
@@ -12,10 +12,22 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Build with ESP-IDF 4.4 container
+      - name: Install ESP-IDF
         run: |
-          docker run --rm \
-            -v $PWD:/project \
-            -w /project \
-            espressif/idf:release-v4.4 \
-            bash -c "idf.py set-target esp32 && idf.py build"
+          sudo apt update
+          sudo apt install -y git wget flex bison gperf python3 python3-pip python3-venv cmake ninja-build ccache libffi-dev libssl-dev dfu-util
+
+      - name: Clone ESP-IDF
+        run: |
+          git clone -b v4.4 --recursive https://github.com/espressif/esp-idf.git $HOME/esp-idf
+
+      - name: Install ESP-IDF tools
+        run: |
+          cd $HOME/esp-idf
+          ./install.sh esp32
+
+      - name: Build project
+        run: |
+          . $HOME/esp-idf/export.sh
+          idf.py set-target esp32
+          idf.py build
