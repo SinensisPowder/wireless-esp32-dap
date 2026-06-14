@@ -1,0 +1,21 @@
+name: ESP-IDF 4.4 Build
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Build with ESP-IDF 4.4 container
+        run: |
+          docker run --rm \
+            -v $PWD:/project \
+            -w /project \
+            espressif/idf:release-v4.4 \
+            bash -c "idf.py set-target esp32 && idf.py build"
